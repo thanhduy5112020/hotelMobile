@@ -1,78 +1,107 @@
 import React from 'react';
-import {View, Text, SafeAreaView, Keyboard, Alert} from 'react-native';
+import { View, Text, SafeAreaView, Keyboard, Alert } from 'react-native';
 import COLORS from '../../conts/colors';
 import Button from '../components/Button';
 import Input from '../components/Input';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Loader from '../components/Loader';
 import DetailsScreen from './DetailsScreen';
+import usePost from '../../hooks/usePost';
+import { AuthContext } from '../../context/AuthContext';
 
-const LoginScreen = ({navigation}) => {
-  const [inputs, setInputs] = React.useState({email: '', password: ''});
+const LoginScreen = ({ navigation }) => {
+  const [inputs, setInputs] = React.useState({ email: '', password: '' });
   const [errors, setErrors] = React.useState({});
   const [loading, setLoading] = React.useState(false);
+
+  const { loading: loadingUser, error, postData } = usePost();
+
+  const { dispatch } = React.useContext(AuthContext);
+
 
   const validate = async () => {
     Keyboard.dismiss();
     let isValid = true;
-    // if (!inputs.email) {
-    //   handleError('Please input email', 'email');
-    //   isValid = false;
-    // }
-    // if (!inputs.password) {
-    //   handleError('Please input password', 'password');
-    //   isValid = false;
-    // }
-    // if (isValid) {
-    //   login();
-    // }
-    //For test
-    navigation.navigate('HomeScreen');
+    if (!inputs.email) {
+      handleError('Please input email', 'email');
+      isValid = false;
+    }
+    if (!inputs.password) {
+      handleError('Please input password', 'password');
+      isValid = false;
+    }
+
+    if (isValid) {
+      login();
+      // const payload = {
+      //   username: inputs.email,
+      //   password: inputs.password,
+      // };
+
+      // try {
+      //   const response = await postData('api/auth/login', payload);
+      //   navigation.navigate('HomeScreen');
+      //   console.log("response ", response)
+      // } catch (err) {
+      //   Alert.alert("Failure", "Try again !");
+      // }
+
+    }
   };
 
-  const login = () => {
+  const login = async () => {
     setLoading(true);
     setTimeout(async () => {
       setLoading(false);
-      let userData = await AsyncStorage.getItem('userData');
-      if (userData) {
-        userData = JSON.parse(userData);
-        if (
-          inputs.email == userData.email &&
-          inputs.password == userData.password
-        ) {
-          navigation.navigate('HomeScreen');
-          AsyncStorage.setItem(
-            'userData',
-            JSON.stringify({...userData, loggedIn: true}),
-          );
-        } else {
-          Alert.alert('Error', 'Invalid Details');
-        }
-      } else {
-        Alert.alert('Error', 'User does not exist');
-      }
-    }, 3000);
+      console.log("Wait ")
+    }, 3000)
+
+    const payload = {
+      username: inputs.email,
+      password: inputs.password,
+    };
+    console.log("paload ", payload)
+    try {
+
+      dispatch({ type: 'LOGIN_START' });
+
+      const response = await postData('api/auth/login', payload);
+      console.log("response ", response)
+    
+      dispatch({ type: 'LOGIN_SUCCESS', payload: response.details });
+
+  
+      navigation.navigate('HomeScreen');
+      
+    } catch (err) {
+  
+      Alert.alert("Failure", "Try again !");
+      console.log(err)
+      dispatch({ type: 'LOGIN_FAILURE', payload: err.message });
+     
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleOnchange = (text, input) => {
-    setInputs(prevState => ({...prevState, [input]: text}));
+    setInputs(prevState => ({ ...prevState, [input]: text }));
   };
 
   const handleError = (error, input) => {
-    setErrors(prevState => ({...prevState, [input]: error}));
+    setErrors(prevState => ({ ...prevState, [input]: error }));
   };
   return (
-    <SafeAreaView style={{backgroundColor: COLORS.white, flex: 1}}>
+    <SafeAreaView style={{ backgroundColor: COLORS.white, flex: 1 }}>
       <Loader visible={loading} />
-      <View style={{paddingTop: 50, paddingHorizontal: 20}}>
-        <Text style={{color: COLORS.black, fontSize: 40, fontWeight: 'bold'}}>
+      <View style={{ paddingTop: 50, paddingHorizontal: 20 }}>
+        <Text style={{ color: COLORS.black, fontSize: 40, fontWeight: 'bold' }}>
           Log In
         </Text>
-        <Text style={{color: COLORS.grey, fontSize: 18, marginVertical: 10}}>
+        <Text style={{ color: COLORS.grey, fontSize: 18, marginVertical: 10 }}>
           Enter Your Details to Login
         </Text>
-        <View style={{marginVertical: 20}}>
+        <View style={{ marginVertical: 20 }}>
           <Input
             onChangeText={text => handleOnchange(text, 'email')}
             onFocus={() => handleError(null, 'email')}

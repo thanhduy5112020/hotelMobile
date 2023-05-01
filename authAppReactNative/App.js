@@ -5,17 +5,20 @@ import LoginScreen from './src/views/screens/LoginScreen';
 import RegistrationScreen from './src/views/screens/RegistrationScreen';
 import HomeScreen from './src/views/screens/HomeScreen';
 import DetailsScreen from './src/views/screens/DetailsScreen';
+import ListScreen from './src/views/screens/ListScreen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Loader from './src/views/components/Loader';
 import { View, Text } from 'react-native';
 import axios from 'axios';
 import useFetch from './src/hooks/useFetch';
+import { AuthContextProvider } from './src/context/AuthContext';
 
 
 const Stack = createNativeStackNavigator();
 
 const App = () => {
   const [initialRouteName, setInitialRouteName] = React.useState('');
+
 
   React.useEffect(() => {
     setTimeout(() => {
@@ -42,25 +45,28 @@ const App = () => {
   };
 
   return (
-    <NavigationContainer>
-      {!initialRouteName ? (
-        <Loader visible={true} />
-      ) : (
-        <>
-          <Stack.Navigator
-            initialRouteName={initialRouteName}
-            screenOptions={{ headerShown: false }}>
-            {/* <Stack.Screen
-              name="RegistrationScreen"
-              component={RegistrationScreen}
-            />
-            <Stack.Screen name="LoginScreen" component={LoginScreen} /> */}
-            <Stack.Screen name="HomeScreen" component={HomeScreen} />
-            <Stack.Screen name="DetailsScreen" component={DetailsScreen} />
-          </Stack.Navigator>
-        </>
-      )}
-    </NavigationContainer>
+    <AuthContextProvider>
+      <NavigationContainer>
+        {!initialRouteName ? (
+          <Loader visible={true} />
+        ) : (
+          <>
+            <Stack.Navigator
+              initialRouteName={initialRouteName}
+              screenOptions={{ headerShown: false }}>
+              <Stack.Screen
+                name="RegistrationScreen"
+                component={RegistrationScreen}
+              />
+              <Stack.Screen name="LoginScreen" component={LoginScreen} />
+              <Stack.Screen name="HomeScreen" component={HomeScreen} />
+              <Stack.Screen name="DetailsScreen" component={DetailsScreen} />
+              <Stack.Screen name="ListScreen" component={ListScreen} />
+            </Stack.Navigator>
+          </>
+        )}
+      </NavigationContainer>
+    </AuthContextProvider>
   );
 };
 

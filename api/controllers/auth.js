@@ -28,7 +28,6 @@ export const register = async (req, res, next) => {
 
 export const login = async (req, res, next) => {
     try {
-        console.log("hello world")
         const user = await User.findOne({ username: req.body.username })
         if (!user) return next(createError(404, "User not found!"))
 
@@ -40,7 +39,7 @@ export const login = async (req, res, next) => {
             { id: user._id, isAdmin: user.isAdmin },
             process.env.JWT
         )
-
+        console.log("token ", token)
         const { password, isAdmin, ...otherDetails } = user._doc
         return res
             .cookie("access_token", token, {

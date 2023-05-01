@@ -1,5 +1,5 @@
 import express from "express";
-import { createHotel, deleteHotel, getHotel, getHotels, updateHotel,countByCity, countByType, getHotelRooms, countByHotel, sumRevenueByHotel, sumByType } from "../controllers/hotel.js";
+import { createHotel, deleteHotel, getHotel, getHotels, updateHotel,countByCity, countByType, getHotelRooms, countByHotel, sumRevenueByHotel, sumByType, searchHotelByLocation } from "../controllers/hotel.js";
 import { verifyAdmin, verifyToken} from "../utils/verifyToken.js";
 import { createError } from "../utils/error.js";
 
@@ -23,6 +23,7 @@ router.get("/sumByType", sumByType)
 //COUNT BY HOTEL
 router.get("/countByHotel", countByHotel)
 router.get("/room/:id", getHotelRooms)
+router.get("/searchHotelByLocation", searchHotelByLocation)
 
 
 export default router

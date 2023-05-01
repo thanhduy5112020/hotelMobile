@@ -1,17 +1,6 @@
 import axios from 'axios';
 import React from 'react';
-import {
-  Dimensions,
-  FlatList,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-  Image,
-  Animated,
+import {Dimensions,FlatList,SafeAreaView,ScrollView,StyleSheet,Text,TextInput,TouchableOpacity,View,Image,Animated, Alert
 } from 'react-native';
 
 import { format, addMonths } from 'date-fns';
@@ -21,13 +10,11 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import COLORS from '../../conts/colors';
 import hotels from '../../conts/hotels';
 import useFetch from '../../hooks/useFetch';
-// import DatePicker from 'react-native-date-picker';
-// import { Calendar } from 'react-native-date-range';
-// import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
-// import CalendarRangePicker from "react-native-calendar-range-picker";
-import DatePicker from 'react-native-datepicker';
 import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
-
+import { Button, Overlay } from '@rneui/themed';
+import RoomAndGuestsPicker from './RoomAndGuestsPicker';
+import { AuthContext } from '../../context/AuthContext';
+// import SearchItem from '../components/SearchItem';
 
 const { width } = Dimensions.get('screen');
 const cardWidth = width / 1.8;
@@ -39,6 +26,8 @@ const HomeScreen = ({ navigation }) => {
   const scrollX = React.useRef(new Animated.Value(0)).current;
   const { data, loading, error } = useFetch("api/hotels")
 
+  const { user } = React.useContext(AuthContext);
+
   const { data: hotelsCount, loading: hotelsCountLoading, error: hotelsCountError } = useFetch("api/hotels/countByHotel");
   const currentDate = new Date();
   const [openDate, setOpenDate] = React.useState(false);
@@ -49,8 +38,6 @@ const HomeScreen = ({ navigation }) => {
       key: 'selection'
     }
   ]);
-
-
 
   const [options, setOptions] = React.useState({
     adult: 1,
@@ -71,6 +58,13 @@ const HomeScreen = ({ navigation }) => {
   const [startDate, setStartDate] = React.useState(null);
   const [endDate, setEndDate] = React.useState(null);
   const [markedDates, setMarkedDates] = React.useState({});
+  const [isHidden, setIsHidden] = React.useState(true);
+
+  const [visible, setVisible] = React.useState(false);
+
+  const toggleOverlay = () => {
+    setVisible(!visible);
+  };
 
   const handleDayPress = (day) => {
     if (!startDate || (startDate && endDate)) {
@@ -108,6 +102,19 @@ const HomeScreen = ({ navigation }) => {
     }
     return range;
   };
+
+  const toggleSearch = (destination, day, people, room) => {
+    if (inputValue.trim() === '') {
+      Alert.alert('Wait !', 'Where are you go?');
+    } else {
+      navigation.navigate('ListScreen', { destination: destination, day: day, people: people, room: room })
+    }
+
+  }
+
+  //Where are you going?
+  const [inputValue, setInputValue] = React.useState('');
+
 
   const CategoryList = ({ navigation }) => {
     return (
@@ -243,7 +250,11 @@ const HomeScreen = ({ navigation }) => {
             Find your hotel
           </Text>
         </View>
-        <Icon name="person-outline" size={38} color={COLORS.grey} />
+        <View style={style.userInfo}>
+          <Icon name="person-outline" size={38} color={COLORS.grey} />
+          <Text style={style.username}>{user?.username}</Text>
+        </View>
+
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -252,6 +263,7 @@ const HomeScreen = ({ navigation }) => {
           <TextInput
             placeholder="Where are you going?"
             style={{ fontSize: 20, paddingLeft: 10 }}
+            onChangeText={text => setInputValue(text)}
           />
         </View>
         <TouchableOpacity onPress={() => setOpenDate(!openDate)}>
@@ -288,14 +300,16 @@ const HomeScreen = ({ navigation }) => {
           </View>
         )}
 
-        <TouchableOpacity onPress={() => console.log('Pressed!')}>
-          <View style={style.headerSearch}>
-            <View style={style.headerSearchItem}>
-              <Icon name="people" size={30} style={{ marginLeft: 20 }} />
-              <Text style={{ fontSize: 20, paddingLeft: 10 }}>{`${options.adult} adult - ${options.children} children - ${options.room} room`}</Text>
-            </View>
+        <RoomAndGuestsPicker options={options} />
+        <TouchableOpacity onPress={() => toggleSearch(inputValue, "Monday", 2, "Single")}>
+          <View style={style.btn} >
+            <Text style={{ color: COLORS.white, fontSize: 18, fontWeight: 'bold' }}>
+              Search
+            </Text>
           </View>
         </TouchableOpacity>
+
+
 
         <CategoryList />
         <View>
@@ -341,6 +355,7 @@ const HomeScreen = ({ navigation }) => {
           renderItem={({ item, index }) => <TopHotelCard hotel={item} index={index} />}
         />
       </ScrollView>
+      {/* <SearchItem /> */}
     </SafeAreaView>
   );
 };
@@ -462,7 +477,25 @@ const style = StyleSheet.create({
     position: 'absolute',
     top: 50,
     zIndex: 2
-  }
+  },
+  btn: {
+    height: 55,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
+    backgroundColor: COLORS.blue,
+    marginHorizontal: 20,
+    borderRadius: 10,
+  },
+  userInfo: {
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  username: {
+    marginTop: 10,
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
 
 });
 

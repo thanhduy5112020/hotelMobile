@@ -7,18 +7,49 @@ import {
   Text,
   View,
   TouchableOpacity,
+  Modal,
 } from 'react-native';
 import COLORS from '../../conts/colors';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { AuthContext } from '../../context/AuthContext';
+import { CheckBox } from '@rneui/base';
 
 const DetailsScreen = ({ navigation, route }) => {
+  const { user } = React.useContext(AuthContext);
   const item = route.params;
+  console.log("item", item?.type)
   const [visible, setVisible] = React.useState(false);
 
   const toggleVisibility = () => {
     console.log(visible)
     setVisible(!visible);
   };
+
+  const confirmBooking = () => {
+    console.log("Booking")
+  }
+
+  const data = [
+    {
+      roomType: 'Deluxe Room',
+      roomDetails: 'King size bed, 1 bathroom, balcony, 1 TV',
+      maxPeople: 2,
+      roomNumbers: ['101', '102', '103'],
+    },
+    {
+      roomType: 'Suite Room',
+      roomDetails: 'King size bed, 2 bathrooms, balcony, 1 living room',
+      maxPeople: 4,
+      roomNumbers: ['201', '202', '203'],
+    },
+    {
+      roomType: 'Standard Room',
+      roomDetails: 'Queen size bed, 1 bathroom, no balcony',
+      maxPeople: 2,
+      roomNumbers: ['301', '302', '303'],
+    },
+  ];
+
 
   return (
     <ScrollView
@@ -32,7 +63,7 @@ const DetailsScreen = ({ navigation, route }) => {
         translucent
         backgroundColor="rgba(0,0,0,0)"
       />
-      <ImageBackground style={style.headerImage} source={{ uri: item.photos[0] }}>
+      <ImageBackground style={style.headerImage} source={{ uri: item?.photos[0] }}>
         <View style={style.header}>
           <Icon
             name="arrow-back-ios"
@@ -48,7 +79,7 @@ const DetailsScreen = ({ navigation, route }) => {
           <Icon name="place" color={COLORS.white} size={28} />
         </View>
         <View style={{ marginTop: 20, paddingHorizontal: 20 }}>
-          <Text style={{ fontSize: 20, fontWeight: 'bold' }}>{item.name}</Text>
+          <Text style={{ fontSize: 20, fontWeight: 'bold' }}>{item?.name}</Text>
           <Text
             style={{
               fontSize: 12,
@@ -56,7 +87,7 @@ const DetailsScreen = ({ navigation, route }) => {
               color: COLORS.grey,
               marginTop: 5,
             }}>
-            {item.city}
+            {item?.city}
           </Text>
           <View
             style={{
@@ -80,7 +111,7 @@ const DetailsScreen = ({ navigation, route }) => {
           </View>
           <View style={{ marginTop: 20 }}>
             <Text style={{ lineHeight: 20, color: COLORS.grey }}>
-              {item.desc}
+              {item?.desc}
             </Text>
           </View>
         </View>
@@ -103,7 +134,7 @@ const DetailsScreen = ({ navigation, route }) => {
                 color: COLORS.grey,
                 marginLeft: 5,
               }}>
-              ${item.cheapestPrice}
+              ${item?.cheapestPrice}
             </Text>
             <Text
               style={{
@@ -126,9 +157,86 @@ const DetailsScreen = ({ navigation, route }) => {
           </View>
         </TouchableOpacity>
 
-        {visible && <View>
-        <Text>This is the component to show or hide</Text>
-      </View>}
+        {visible &&
+          <Modal
+            animationType="fade"
+            transparent={true}
+            visible={visible}
+            onRequestClose={toggleVisibility}
+          >
+            <View style={style.modalContainer}>
+              <View style={style.modalBox}>
+                <TouchableOpacity onPress={toggleVisibility} style={style.closeButton}>
+                  <Icon name="close" size={24} color={COLORS.grey} />
+                </TouchableOpacity>
+                <Text style={style.modalTitle}>Select your rooms:</Text>
+                <ScrollView style={style.modalContentContainer}>
+                    <View style={style.roomContainer}>
+                      <View style={style.roomItem}>
+                        <Text style={style.roomType}>Queen Suit</Text>
+                        <Text style={style.roomDetails}>King size bed, 1 bathroom, balcony, 1 TV</Text>
+                        <Text style={style.roomMaxPeople}>Max People: 2</Text>
+                        <View style={style.checkboxContainer}>
+                          <CheckBox style={style.checkbox} />
+                          <Text style={style.checkboxLabel}>101</Text>
+                        </View>
+                        <View style={style.checkboxContainer}>
+                          <CheckBox style={style.checkbox} />
+                          <Text style={style.checkboxLabel}>102</Text>
+                        </View>
+                        <View style={style.checkboxContainer}>
+                          <CheckBox style={style.checkbox} />
+                          <Text style={style.checkboxLabel}>103</Text>
+                        </View>
+                      </View>
+
+                      <View style={style.roomItem}>
+                        <Text style={style.roomType}>Standard room</Text>
+                        <Text style={style.roomDetails}>Fully Furnished, Wifi free</Text>
+                        <Text style={style.roomMaxPeople}>Max People: 5</Text>
+                        <View style={style.checkboxContainer}>
+                          <CheckBox style={style.checkbox} />
+                          <Text style={style.checkboxLabel}>201</Text>
+                        </View>
+                        <View style={style.checkboxContainer}>
+                          <CheckBox style={style.checkbox} />
+                          <Text style={style.checkboxLabel}>202</Text>
+                        </View>
+                        <View style={style.checkboxContainer}>
+                          <CheckBox style={style.checkbox} />
+                          <Text style={style.checkboxLabel}>20</Text>
+                        </View>
+                      </View>
+
+                      <View style={style.roomItem}>
+                        <Text style={style.roomType}>Standard room</Text>
+                        <Text style={style.roomDetails}>Fully Furnished, Wifi free</Text>
+                        <Text style={style.roomMaxPeople}>Max People: 5</Text>
+                        <View style={style.checkboxContainer}>
+                          <CheckBox style={style.checkbox} />
+                          <Text style={style.checkboxLabel}>201</Text>
+                        </View>
+                        <View style={style.checkboxContainer}>
+                          <CheckBox style={style.checkbox} />
+                          <Text style={style.checkboxLabel}>202</Text>
+                        </View>
+                        <View style={style.checkboxContainer}>
+                          <CheckBox style={style.checkbox} />
+                          <Text style={style.checkboxLabel}>20</Text>
+                        </View>
+                      </View>
+                    </View>
+
+                  <TouchableOpacity style={style.confirmButton} onPress={confirmBooking}>
+                    <Text style={style.confirmButtonText}>Confirm</Text>
+                  </TouchableOpacity>
+                </ScrollView>
+
+              </View>
+            </View>
+          </Modal>
+        }
+
 
       </View>
     </ScrollView>
@@ -187,6 +295,75 @@ const style = StyleSheet.create({
     borderRadius: 5,
     margin: 10,
   },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalBox: {
+    backgroundColor: COLORS.white,
+    padding: 20,
+    borderRadius: 10,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  modalContentContainer: {
+    flexGrow: 2,
+  },
+  roomContainer: {
+    marginTop: 10,
+  },
+  roomItem: {
+    marginBottom: 20,
+  },
+  roomType: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 5,
+  },
+  roomDetails: {
+    fontSize: 14,
+    marginBottom: 5,
+  },
+  roomMaxPeople: {
+    fontSize: 14,
+    marginBottom: 5,
+  },
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 5,
+  },
+  checkbox: {
+    marginRight: 100, // Adjust this value as needed
+  },
+  checkboxLabel: {
+    fontSize: 14,
+  },
+  confirmButton: {
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: COLORS.primary,
+    borderRadius: 10,
+    marginTop: 20,
+  },
+  confirmButtonText: {
+    color: COLORS.white,
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    zIndex: 1,
+  },
+
 });
 
 export default DetailsScreen;
