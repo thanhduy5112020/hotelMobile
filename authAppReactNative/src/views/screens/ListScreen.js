@@ -20,22 +20,13 @@ const { width } = Dimensions.get('screen');
 const cardWidth = width / 1.8;
 
 const ListScreen = ({ navigation, route }) => {
-    const { destination, day, people, room } = route.params;
+    const { destination, day, people } = route.params.state;
     const { user } = React.useContext(AuthContext);
 
-    const searchData = [
-        { name: 'Hotel A', distance: 500, city: 'New York', type: 'Hotel', cheapestPrice: 100, _id: 'hotel1' },
-        { name: 'Hotel B', distance: 700, city: 'London', type: 'Apartment', cheapestPrice: 120, _id: 'hotel2' },
-    ];
     const queryString = `api/hotels/searchHotelByLocation?city=${destination}`;
+    // const queryString = `api/hotels/searchHotelByLocation?city=Ha Noi`;
     const { data: dataSearch, loading: dataSearchLoading, error: dataSearchError } = useFetch(queryString);
 
-
-    const renderItem = ({ item }) => (
-        <View style={styles.itemContainer}>
-            <Text style={styles.itemText}>{item.name}</Text>
-        </View>
-    );
 
     return (
 
@@ -64,9 +55,6 @@ const ListScreen = ({ navigation, route }) => {
                         data={dataSearch}
                         renderItem={({ item }) => <SearchItem item={item} navigation={navigation}/>}
                         keyExtractor={(item) => item?._id.toString()}
-                        // keyExtractor={(_,i) => i.toString()}
-                        // keyExtractor={(item) => item?.id.toString()}
-                        // keyExtractor={(item) => item.toString()}
                     />
                 </View>
             </ScrollView>

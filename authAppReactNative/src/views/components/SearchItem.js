@@ -2,7 +2,6 @@ import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const SearchItem = ({ item, navigation}) => {
-
   return (
     <View style={styles.searchItem}>
       <Image source={{ uri: item?.photos[0] }} style={styles.siImg} />

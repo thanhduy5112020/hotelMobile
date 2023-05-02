@@ -1,16 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Button, Overlay } from '@rneui/themed';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import COLORS from '../../conts/colors';
 
 
-const RoomAndGuestsPicker = ({ options }) => {
+const RoomAndGuestsPicker = ({ options, onChangeTotalGuests }) => {
     const [visible, setVisible] = useState(false);
     const [rooms, setRooms] = useState(1);
     const [adults, setAdults] = useState(1);
     const [children, setChildren] = useState(0);
+    const [totalGuests, setTotalGuests] = useState(1);
     console.log("Options ", options)
+
+    useEffect(() => {
+        const calculateTotalGuests = () => {
+          const total = adults + children;
+          setTotalGuests(total);
+          onChangeTotalGuests(total);
+        };
+    
+        calculateTotalGuests();
+      }, [adults, children, onChangeTotalGuests]);
 
     const toggleOverlay = () => {
         setVisible(!visible);

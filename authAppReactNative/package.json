@@ -12,6 +12,7 @@
   "dependencies": {
     "@fortawesome/react-native-fontawesome": "^0.3.0",
     "@react-native-async-storage/async-storage": "^1.16.1",
+    "@react-native-community/checkbox": "^0.5.15",
     "@react-navigation/native": "^6.0.8",
     "@react-navigation/native-stack": "^6.5.0",
     "@rneui/base": "^0.0.0-edge.2",

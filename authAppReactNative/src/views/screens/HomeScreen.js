@@ -3,7 +3,7 @@ import React from 'react';
 import {Dimensions,FlatList,SafeAreaView,ScrollView,StyleSheet,Text,TextInput,TouchableOpacity,View,Image,Animated, Alert
 } from 'react-native';
 
-import { format, addMonths } from 'date-fns';
+import { format, addMonths, differenceInDays } from 'date-fns';
 import { BottomSheet } from '@rneui/themed';
 
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -14,6 +14,7 @@ import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
 import { Button, Overlay } from '@rneui/themed';
 import RoomAndGuestsPicker from './RoomAndGuestsPicker';
 import { AuthContext } from '../../context/AuthContext';
+import { SearchContext } from '../../context/SearchContext';
 // import SearchItem from '../components/SearchItem';
 
 const { width } = Dimensions.get('screen');
@@ -28,8 +29,6 @@ const HomeScreen = ({ navigation }) => {
 
   const { user } = React.useContext(AuthContext);
 
-  const { data: hotelsCount, loading: hotelsCountLoading, error: hotelsCountError } = useFetch("api/hotels/countByHotel");
-  const currentDate = new Date();
   const [openDate, setOpenDate] = React.useState(false);
   const [dates, setDates] = React.useState([
     {
@@ -55,12 +54,13 @@ const HomeScreen = ({ navigation }) => {
   const types = data.map((hotel) => typeMapping[hotel.type]);
 
   //Booking calendar
-  const [startDate, setStartDate] = React.useState(null);
-  const [endDate, setEndDate] = React.useState(null);
+  const [startDate, setStartDate] = React.useState(new Date().toLocaleDateString());
+  const [endDate, setEndDate] = React.useState(new Date().toLocaleDateString());
   const [markedDates, setMarkedDates] = React.useState({});
   const [isHidden, setIsHidden] = React.useState(true);
 
   const [visible, setVisible] = React.useState(false);
+
 
   const toggleOverlay = () => {
     setVisible(!visible);
@@ -93,6 +93,8 @@ const HomeScreen = ({ navigation }) => {
     setMarkedDates({});
   };
 
+
+
   const getRangeOfDates = (start, end) => {
     const startDate = new Date(start);
     const endDate = new Date(end);
@@ -102,17 +104,37 @@ const HomeScreen = ({ navigation }) => {
     }
     return range;
   };
+  
+  console.log("range date ", getRangeOfDates(startDate, endDate))
 
+  //Total of day
+  const calculateNumberOfDays = (startDate, endDate) => {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const numberOfDays = differenceInDays(end, start) + 1;
+    return numberOfDays;
+  };
+
+  const numberOfDays = calculateNumberOfDays(startDate, endDate);
+
+  //Total People
+  const [totalGuests, setTotalGuests] = React.useState(1);
+  const handleTotalGuestsChange = (total) => {
+    setTotalGuests(total); // Cập nhật giá trị totalGuests vào state
+  };
+
+  //Where are you going?
+  const { updateSearch } = React.useContext(SearchContext);
   const toggleSearch = (destination, day, people, room) => {
     if (inputValue.trim() === '') {
       Alert.alert('Wait !', 'Where are you go?');
     } else {
-      navigation.navigate('ListScreen', { destination: destination, day: day, people: people, room: room })
+      updateSearch(people, destination, day);
+      navigation.navigate('ListScreen', { state: { destination, day, people } })
     }
 
   }
 
-  //Where are you going?
   const [inputValue, setInputValue] = React.useState('');
 
 
@@ -300,8 +322,8 @@ const HomeScreen = ({ navigation }) => {
           </View>
         )}
 
-        <RoomAndGuestsPicker options={options} />
-        <TouchableOpacity onPress={() => toggleSearch(inputValue, "Monday", 2, "Single")}>
+        <RoomAndGuestsPicker options={options} onChangeTotalGuests={handleTotalGuestsChange}/>
+        <TouchableOpacity onPress={() => toggleSearch(inputValue, numberOfDays, totalGuests, "Single")}>
           <View style={style.btn} >
             <Text style={{ color: COLORS.white, fontSize: 18, fontWeight: 'bold' }}>
               Search
@@ -331,7 +353,7 @@ const HomeScreen = ({ navigation }) => {
               paddingRight: cardWidth / 2 - 40,
             }}
             showsHorizontalScrollIndicator={false}
-            renderItem={({ item, index }) => <Card hotel={item} index={index} />}
+            renderItem={({ item, index }) => <Card hotel={item} index={index} key={index}/>}
             snapToInterval={cardWidth}
           />
         </View>

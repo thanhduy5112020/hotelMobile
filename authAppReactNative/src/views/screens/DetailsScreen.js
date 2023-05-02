@@ -13,11 +13,16 @@ import COLORS from '../../conts/colors';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { AuthContext } from '../../context/AuthContext';
 import { CheckBox } from '@rneui/base';
+import Reserve from '../components/Reserve';
+import useFetch from '../../hooks/useFetch';
+import { SearchContext } from '../../context/SearchContext';
 
 const DetailsScreen = ({ navigation, route }) => {
+  const { guests, destination, numberOfDays } = React.useContext(SearchContext);
+  console.log("searchData ", guests, destination, numberOfDays)
+  //Total, NumOfDate
   const { user } = React.useContext(AuthContext);
   const item = route.params;
-  console.log("item", item?.type)
   const [visible, setVisible] = React.useState(false);
 
   const toggleVisibility = () => {
@@ -29,27 +34,8 @@ const DetailsScreen = ({ navigation, route }) => {
     console.log("Booking")
   }
 
-  const data = [
-    {
-      roomType: 'Deluxe Room',
-      roomDetails: 'King size bed, 1 bathroom, balcony, 1 TV',
-      maxPeople: 2,
-      roomNumbers: ['101', '102', '103'],
-    },
-    {
-      roomType: 'Suite Room',
-      roomDetails: 'King size bed, 2 bathrooms, balcony, 1 living room',
-      maxPeople: 4,
-      roomNumbers: ['201', '202', '203'],
-    },
-    {
-      roomType: 'Standard Room',
-      roomDetails: 'Queen size bed, 1 bathroom, no balcony',
-      maxPeople: 2,
-      roomNumbers: ['301', '302', '303'],
-    },
-  ];
-
+  const linkRoom = `api/hotels/room/${item?._id}`
+  const { data: roomByHotel, loading: roomLoading, error: roomError } = useFetch(linkRoom);
 
   return (
     <ScrollView
@@ -171,61 +157,17 @@ const DetailsScreen = ({ navigation, route }) => {
                 </TouchableOpacity>
                 <Text style={style.modalTitle}>Select your rooms:</Text>
                 <ScrollView style={style.modalContentContainer}>
-                    <View style={style.roomContainer}>
-                      <View style={style.roomItem}>
-                        <Text style={style.roomType}>Queen Suit</Text>
-                        <Text style={style.roomDetails}>King size bed, 1 bathroom, balcony, 1 TV</Text>
-                        <Text style={style.roomMaxPeople}>Max People: 2</Text>
-                        <View style={style.checkboxContainer}>
-                          <CheckBox style={style.checkbox} />
-                          <Text style={style.checkboxLabel}>101</Text>
-                        </View>
-                        <View style={style.checkboxContainer}>
-                          <CheckBox style={style.checkbox} />
-                          <Text style={style.checkboxLabel}>102</Text>
-                        </View>
-                        <View style={style.checkboxContainer}>
-                          <CheckBox style={style.checkbox} />
-                          <Text style={style.checkboxLabel}>103</Text>
-                        </View>
-                      </View>
+                  <View style={style.roomContainer}>
+                    {roomByHotel.map(item => (
+                      <View key={item._id}>
+                        <Reserve item={item} />
 
-                      <View style={style.roomItem}>
-                        <Text style={style.roomType}>Standard room</Text>
-                        <Text style={style.roomDetails}>Fully Furnished, Wifi free</Text>
-                        <Text style={style.roomMaxPeople}>Max People: 5</Text>
-                        <View style={style.checkboxContainer}>
-                          <CheckBox style={style.checkbox} />
-                          <Text style={style.checkboxLabel}>201</Text>
-                        </View>
-                        <View style={style.checkboxContainer}>
-                          <CheckBox style={style.checkbox} />
-                          <Text style={style.checkboxLabel}>202</Text>
-                        </View>
-                        <View style={style.checkboxContainer}>
-                          <CheckBox style={style.checkbox} />
-                          <Text style={style.checkboxLabel}>20</Text>
-                        </View>
-                      </View>
+                      </View>)
+                    )
+                    }
+                  </View>
 
-                      <View style={style.roomItem}>
-                        <Text style={style.roomType}>Standard room</Text>
-                        <Text style={style.roomDetails}>Fully Furnished, Wifi free</Text>
-                        <Text style={style.roomMaxPeople}>Max People: 5</Text>
-                        <View style={style.checkboxContainer}>
-                          <CheckBox style={style.checkbox} />
-                          <Text style={style.checkboxLabel}>201</Text>
-                        </View>
-                        <View style={style.checkboxContainer}>
-                          <CheckBox style={style.checkbox} />
-                          <Text style={style.checkboxLabel}>202</Text>
-                        </View>
-                        <View style={style.checkboxContainer}>
-                          <CheckBox style={style.checkbox} />
-                          <Text style={style.checkboxLabel}>20</Text>
-                        </View>
-                      </View>
-                    </View>
+
 
                   <TouchableOpacity style={style.confirmButton} onPress={confirmBooking}>
                     <Text style={style.confirmButtonText}>Confirm</Text>
