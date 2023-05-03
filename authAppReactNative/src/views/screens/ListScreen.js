@@ -22,11 +22,12 @@ const cardWidth = width / 1.8;
 const ListScreen = ({ navigation, route }) => {
     const { destination, day, people } = route.params.state;
     const { user } = React.useContext(AuthContext);
+    const [minPrice, setMinPrice] = React.useState(0);
+    const [maxPrice, setMaxPrice] = React.useState(999999);
 
-    const queryString = `api/hotels/searchHotelByLocation?city=${destination}`;
+    const queryString = `api/hotels/searchHotelByLocation?city=${destination}&minPrice=${minPrice}&maxPrice=${maxPrice}`;
     // const queryString = `api/hotels/searchHotelByLocation?city=Ha Noi`;
     const { data: dataSearch, loading: dataSearchLoading, error: dataSearchError } = useFetch(queryString);
-
 
     return (
 
@@ -47,13 +48,33 @@ const ListScreen = ({ navigation, route }) => {
                     <Icon name="person-outline" size={38} color={COLORS.grey} />
                     <Text style={style.username}>{user?.username}</Text>
                 </View>
+
+
             </View>
-        
+
+            <View style={style.searchInputContainer}>
+                <View style={{ flex: 1, flexDirection: 'row' }}>
+                    <TextInput
+                        style={{ flex: 1, marginRight: 5 }}
+                        placeholder="Min Price"
+                        value={minPrice}
+                        onChangeText={setMinPrice}
+                    />
+                    <TextInput
+                        style={{ flex: 1, marginLeft: 5 }}
+                        placeholder="Max Price"
+                        value={maxPrice}
+                        onChangeText={setMaxPrice}
+                    />
+                </View>
+            </View>
+
+
             <ScrollView>
                 <View style={styles.container}>
                     <FlatList
                         data={dataSearch}
-                        renderItem={({ item }) => <SearchItem item={item} navigation={navigation}/>}
+                        renderItem={({ item }) => <SearchItem item={item} navigation={navigation} />}
                         keyExtractor={(item) => item?._id.toString()}
                     />
                 </View>
@@ -74,9 +95,9 @@ const style = StyleSheet.create({
     searchInputContainer: {
         height: 50,
         backgroundColor: COLORS.light,
-        marginTop: 15,
         marginLeft: 20,
         marginRight: 20,
+        marginBottom: 20,
         borderTopLeftRadius: 30,
         borderTopRightRadius: 30,
         borderBottomLeftRadius: 30,

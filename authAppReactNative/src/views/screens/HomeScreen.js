@@ -1,6 +1,7 @@
 import axios from 'axios';
 import React from 'react';
-import {Dimensions,FlatList,SafeAreaView,ScrollView,StyleSheet,Text,TextInput,TouchableOpacity,View,Image,Animated, Alert
+import {
+  Dimensions, FlatList, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, Image, Animated, Alert
 } from 'react-native';
 
 import { format, addMonths, differenceInDays } from 'date-fns';
@@ -57,14 +58,7 @@ const HomeScreen = ({ navigation }) => {
   const [startDate, setStartDate] = React.useState(new Date().toLocaleDateString());
   const [endDate, setEndDate] = React.useState(new Date().toLocaleDateString());
   const [markedDates, setMarkedDates] = React.useState({});
-  const [isHidden, setIsHidden] = React.useState(true);
 
-  const [visible, setVisible] = React.useState(false);
-
-
-  const toggleOverlay = () => {
-    setVisible(!visible);
-  };
 
   const handleDayPress = (day) => {
     if (!startDate || (startDate && endDate)) {
@@ -94,19 +88,6 @@ const HomeScreen = ({ navigation }) => {
   };
 
 
-
-  const getRangeOfDates = (start, end) => {
-    const startDate = new Date(start);
-    const endDate = new Date(end);
-    const range = [];
-    for (let date = startDate; date <= endDate; date.setDate(date.getDate() + 1)) {
-      range.push(new Date(date).toISOString().slice(0, 10));
-    }
-    return range;
-  };
-  
-  console.log("range date ", getRangeOfDates(startDate, endDate))
-
   //Total of day
   const calculateNumberOfDays = (startDate, endDate) => {
     const start = new Date(startDate);
@@ -125,14 +106,24 @@ const HomeScreen = ({ navigation }) => {
 
   //Where are you going?
   const { updateSearch } = React.useContext(SearchContext);
-  const toggleSearch = (destination, day, people, room) => {
+  const getRangeOfDates = (start, end) => {
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+    const range = [];
+    for (let date = startDate; date <= endDate; date.setDate(date.getDate() + 1)) {
+      range.push(new Date(date).toISOString().slice(0, 10));
+    }
+    return range;
+  };
+  const daterange = getRangeOfDates(startDate, endDate)
+  console.log("range date ", getRangeOfDates(startDate, endDate))
+  const toggleSearch = (destination, day, people, daterange) => {
     if (inputValue.trim() === '') {
       Alert.alert('Wait !', 'Where are you go?');
     } else {
-      updateSearch(people, destination, day);
+      updateSearch(people, destination, day, daterange);
       navigation.navigate('ListScreen', { state: { destination, day, people } })
     }
-
   }
 
   const [inputValue, setInputValue] = React.useState('');
@@ -185,16 +176,22 @@ const HomeScreen = ({ navigation }) => {
       <TouchableOpacity
         disabled={activeCardIndex != index}
         activeOpacity={1}
-        onPress={() => navigation.navigate('DetailsScreen', hotel)
-        }
+        onPress={() => {
+          updateSearch(totalGuests, "", numberOfDays, daterange);
+          navigation.navigate('DetailsScreen', hotel);
+        }}
       >
         <Animated.View style={{ ...style.card, transform: [{ scale }] }}>
           <Animated.View style={{ ...style.cardOverLay, opacity }} />
           <View style={style.priceTag}>
+            {hotel.rating ? 
             <Text
               style={{ color: COLORS.white, fontSize: 20, fontWeight: 'bold' }}>
-              ${hotel.cheapestPrice}
-            </Text>
+              {hotel.rating}
+            </Text> : <Text
+              style={{ color: COLORS.white, fontSize: 20, fontWeight: 'bold' }}>
+              8.0
+            </Text>}
           </View>
           <Image source={{ uri: hotel.photos[0] }} style={style.cardImage} />
           <View style={style.cardDetails}>
@@ -230,6 +227,8 @@ const HomeScreen = ({ navigation }) => {
       </TouchableOpacity>
     );
   };
+  const { data: topHotel, loading: topHotelLoading, error: topHotelError } = useFetch("api/hotels/getTopRatedHotels")
+
   const TopHotelCard = ({ hotel, index }) => {
     return (
       <View style={style.topHotelCard}>
@@ -244,8 +243,8 @@ const HomeScreen = ({ navigation }) => {
           <Icon name="star" size={15} color={COLORS.orange} />
           <Text style={{ color: COLORS.white, fontWeight: 'bold', fontSize: 15 }}>
             {types[index]} star
-            {/* 5.0 */}
           </Text>
+
         </View>
         <Image style={style.topHotelCardImage} source={{ uri: hotel.photos[0] }} />
         <View style={{ paddingVertical: 5, paddingHorizontal: 10 }}>
@@ -322,8 +321,8 @@ const HomeScreen = ({ navigation }) => {
           </View>
         )}
 
-        <RoomAndGuestsPicker options={options} onChangeTotalGuests={handleTotalGuestsChange}/>
-        <TouchableOpacity onPress={() => toggleSearch(inputValue, numberOfDays, totalGuests, "Single")}>
+        <RoomAndGuestsPicker options={options} onChangeTotalGuests={handleTotalGuestsChange} />
+        <TouchableOpacity onPress={() => toggleSearch(inputValue, numberOfDays, totalGuests, daterange)}>
           <View style={style.btn} >
             <Text style={{ color: COLORS.white, fontSize: 18, fontWeight: 'bold' }}>
               Search
@@ -353,7 +352,7 @@ const HomeScreen = ({ navigation }) => {
               paddingRight: cardWidth / 2 - 40,
             }}
             showsHorizontalScrollIndicator={false}
-            renderItem={({ item, index }) => <Card hotel={item} index={index} key={index}/>}
+            renderItem={({ item, index }) => <Card hotel={item} index={index} key={index} />}
             snapToInterval={cardWidth}
           />
         </View>
@@ -368,7 +367,7 @@ const HomeScreen = ({ navigation }) => {
           </Text>
           <Text style={{ color: COLORS.grey }}>Show all</Text>
         </View>
-        <FlatList data={data} horizontal showsHorizontalScrollIndicator={false}
+        <FlatList data={topHotel} horizontal showsHorizontalScrollIndicator={false}
           contentContainerStyle={{
             paddingLeft: 20,
             marginTop: 20,

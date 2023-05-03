@@ -18,9 +18,12 @@ import useFetch from '../../hooks/useFetch';
 import { SearchContext } from '../../context/SearchContext';
 
 const DetailsScreen = ({ navigation, route }) => {
-  const { guests, destination, numberOfDays } = React.useContext(SearchContext);
+  const { guests, destination, numberOfDays, dateRange } = React.useContext(SearchContext);
   console.log("searchData ", guests, destination, numberOfDays)
+  console.log("dateRange ", dateRange)
   //Total, NumOfDate
+
+
   const { user } = React.useContext(AuthContext);
   const item = route.params;
   const [visible, setVisible] = React.useState(false);
@@ -31,11 +34,31 @@ const DetailsScreen = ({ navigation, route }) => {
   };
 
   const confirmBooking = () => {
-    console.log("Booking")
+    console.log("Selected Rooms: ", selectedRooms);
+    // Thực hiện xử lý đặt phòng hoặc các tác vụ khác với danh sách phòng được chọn
   }
+
 
   const linkRoom = `api/hotels/room/${item?._id}`
   const { data: roomByHotel, loading: roomLoading, error: roomError } = useFetch(linkRoom);
+
+  const [selectedRooms, setSelectedRooms] = React.useState([]);
+
+  const handleCheckboxChange = (roomId) => {
+    if (selectedRooms.includes(roomId)) {
+      setSelectedRooms(selectedRooms.filter((id) => id !== roomId));
+    } else {
+      setSelectedRooms([...selectedRooms, roomId]);
+    }
+  };
+
+  const priceBooking = () => {
+    console.log("numberOfDays ", numberOfDays)
+    console.log("item?.cheapestPrice ",item?.cheapestPrice)
+    return numberOfDays*item?.cheapestPrice
+  }
+  const totalMount = priceBooking()
+  console.log("totalMount", totalMount)
 
   return (
     <ScrollView
@@ -51,12 +74,7 @@ const DetailsScreen = ({ navigation, route }) => {
       />
       <ImageBackground style={style.headerImage} source={{ uri: item?.photos[0] }}>
         <View style={style.header}>
-          <Icon
-            name="arrow-back-ios"
-            size={28}
-            color={COLORS.white}
-            onPress={navigation.goBack}
-          />
+          <Icon name="arrow-back-ios" size={28}color={COLORS.white} onPress={navigation.goBack}/>
           <Icon name="bookmark-border" size={28} color={COLORS.white} />
         </View>
       </ImageBackground>
@@ -110,36 +128,18 @@ const DetailsScreen = ({ navigation, route }) => {
             alignItems: 'center',
           }}>
           <Text style={{ fontSize: 20, fontWeight: 'bold' }}>
-            Price per night
+            Price for {numberOfDays} days
           </Text>
           <View style={style.priceTag}>
-            <Text
-              style={{
-                fontSize: 16,
-                fontWeight: 'bold',
-                color: COLORS.grey,
-                marginLeft: 5,
-              }}>
-              ${item?.cheapestPrice}
-            </Text>
-            <Text
-              style={{
-                fontSize: 12,
-                fontWeight: 'bold',
-                color: COLORS.grey,
-                marginLeft: 5,
-              }}>
-              +breakfast
-            </Text>
+            <Text style={{ fontSize: 16, fontWeight: 'bold', color: COLORS.grey, marginLeft: 5, }}> ${totalMount} </Text>
+            <Text style={{ fontSize: 12, fontWeight: 'bold', color: COLORS.grey, marginLeft: 5, }}> +breakfast</Text>
           </View>
         </View>
 
 
         <TouchableOpacity onPress={toggleVisibility}>
           <View style={style.btn} >
-            <Text style={{ color: COLORS.white, fontSize: 18, fontWeight: 'bold' }}>
-              Book Now
-            </Text>
+            <Text style={{ color: COLORS.white, fontSize: 18, fontWeight: 'bold' }}>Book Now  </Text>
           </View>
         </TouchableOpacity>
 
@@ -160,15 +160,10 @@ const DetailsScreen = ({ navigation, route }) => {
                   <View style={style.roomContainer}>
                     {roomByHotel.map(item => (
                       <View key={item._id}>
-                        <Reserve item={item} />
-
+                        <Reserve item={item} onCheckboxChange={handleCheckboxChange} selectedRooms={selectedRooms} guests={guests}/>
                       </View>)
-                    )
-                    }
+                    ) }
                   </View>
-
-
-
                   <TouchableOpacity style={style.confirmButton} onPress={confirmBooking}>
                     <Text style={style.confirmButtonText}>Confirm</Text>
                   </TouchableOpacity>
@@ -178,8 +173,6 @@ const DetailsScreen = ({ navigation, route }) => {
             </View>
           </Modal>
         }
-
-
       </View>
     </ScrollView>
   );

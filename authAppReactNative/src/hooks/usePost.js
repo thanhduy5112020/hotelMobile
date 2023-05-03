@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from 'axios';
 
-const iplink = "http://192.168.2.36:3000/";
+const iplink = "http://10.3.54.108:3000/";
 
 const usePost = () => {
   const [loading, setLoading] = useState(false);
