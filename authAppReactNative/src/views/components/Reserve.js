@@ -3,8 +3,22 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import COLORS from '../../conts/colors';
 import CheckBox from '@react-native-community/checkbox';
 
-const Reserve = ({ item, navigation, onCheckboxChange, selectedRooms, guests }) => {
- 
+const Reserve = ({ item, navigation, onCheckboxChange, selectedRooms, guests, dateRange, selectedRoomDetails }) => {
+    console.log("reerse item ", item?.title)
+    item?.roomNumbers.forEach((roomNumber) => {
+        console.log("roomNumber ", selectedRooms)
+        if (selectedRooms.includes(roomNumber._id)) {
+            const room = item?.roomNumbers.find((room) => room._id === roomNumber);
+            console.log("room ", room)
+            selectedRoomDetails.push({
+                number: roomNumber.number,
+                type: item?.title,
+            });
+        }
+    });
+    console.log("selectedRoomDetails ", selectedRoomDetails)
+
+    console.log("selectedRoomDetails ", selectedRoomDetails)
     return (
         <View style={style.roomItem}>
             <Text style={style.roomType}>{item?.title}</Text>
@@ -14,11 +28,14 @@ const Reserve = ({ item, navigation, onCheckboxChange, selectedRooms, guests }) 
 
                 {item?.roomNumbers.map((roomNumber) => {
                     const room = item?.roomNumbers.find((room) => room._id === roomNumber);
+                    const unavailableDates = roomNumber.unavailableDates || []
+                    const dateRangeArray = dateRange.map((date) => date + "T00:00:00.000Z");
+                    const isConflict = dateRangeArray.some((date) => unavailableDates.includes(date));
                     const disabled = item?.maxPeople < guests;
                     return (
                         <View key={roomNumber._id}>
                             <CheckBox
-                                disabled={disabled}
+                                disabled={disabled || isConflict}
                                 value={selectedRooms.includes(roomNumber._id)}
                                 onValueChange={() => onCheckboxChange(roomNumber._id)}
                             />

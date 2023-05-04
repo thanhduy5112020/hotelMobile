@@ -7,7 +7,7 @@ import {
   Text,
   View,
   TouchableOpacity,
-  Modal,
+  Modal, TextInput
 } from 'react-native';
 import COLORS from '../../conts/colors';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -16,32 +16,47 @@ import { CheckBox } from '@rneui/base';
 import Reserve from '../components/Reserve';
 import useFetch from '../../hooks/useFetch';
 import { SearchContext } from '../../context/SearchContext';
+import axios from 'axios';
 
 const DetailsScreen = ({ navigation, route }) => {
   const { guests, destination, numberOfDays, dateRange } = React.useContext(SearchContext);
-  console.log("searchData ", guests, destination, numberOfDays)
-  console.log("dateRange ", dateRange)
-  //Total, NumOfDate
 
 
   const { user } = React.useContext(AuthContext);
   const item = route.params;
+  const nameHotel = item?.name
   const [visible, setVisible] = React.useState(false);
 
   const toggleVisibility = () => {
-    console.log(visible)
     setVisible(!visible);
   };
 
-  const confirmBooking = () => {
-    console.log("Selected Rooms: ", selectedRooms);
-    // Thực hiện xử lý đặt phòng hoặc các tác vụ khác với danh sách phòng được chọn
+  const confirmBooking = async () => {
+    try {
+      await Promise.all(
+        selectedRooms.map((roomId) => {
+
+          const res = axios.put(`http://10.3.54.108:3000/api/rooms/availability/${roomId}`, {
+            dates: dateRange,
+          });
+
+          return res.data;
+        })
+      );
+      setVisible(!visible);
+      navigation.navigate('BookingConfirmationScreen',  { confirm: { user, dateRange, nameHotel, totalMount, selectedRoomDetails} });
+     
+
+    }
+    catch (err) {
+      console.log(err)
+    }
+
   }
 
 
   const linkRoom = `api/hotels/room/${item?._id}`
   const { data: roomByHotel, loading: roomLoading, error: roomError } = useFetch(linkRoom);
-
   const [selectedRooms, setSelectedRooms] = React.useState([]);
 
   const handleCheckboxChange = (roomId) => {
@@ -53,13 +68,11 @@ const DetailsScreen = ({ navigation, route }) => {
   };
 
   const priceBooking = () => {
-    console.log("numberOfDays ", numberOfDays)
-    console.log("item?.cheapestPrice ",item?.cheapestPrice)
-    return numberOfDays*item?.cheapestPrice
+    return numberOfDays * item?.cheapestPrice
   }
   const totalMount = priceBooking()
-  console.log("totalMount", totalMount)
 
+  const [selectedRoomDetails, setSelectedRoomDetails] = React.useState([])
   return (
     <ScrollView
       showsVerticalScrollIndicator={false}
@@ -74,7 +87,7 @@ const DetailsScreen = ({ navigation, route }) => {
       />
       <ImageBackground style={style.headerImage} source={{ uri: item?.photos[0] }}>
         <View style={style.header}>
-          <Icon name="arrow-back-ios" size={28}color={COLORS.white} onPress={navigation.goBack}/>
+          <Icon name="arrow-back-ios" size={28} color={COLORS.white} onPress={navigation.goBack} />
           <Icon name="bookmark-border" size={28} color={COLORS.white} />
         </View>
       </ImageBackground>
@@ -160,9 +173,9 @@ const DetailsScreen = ({ navigation, route }) => {
                   <View style={style.roomContainer}>
                     {roomByHotel.map(item => (
                       <View key={item._id}>
-                        <Reserve item={item} onCheckboxChange={handleCheckboxChange} selectedRooms={selectedRooms} guests={guests}/>
+                        <Reserve item={item} onCheckboxChange={handleCheckboxChange} selectedRooms={selectedRooms} guests={guests} dateRange={dateRange} selectedRoomDetails={selectedRoomDetails}/>
                       </View>)
-                    ) }
+                    )}
                   </View>
                   <TouchableOpacity style={style.confirmButton} onPress={confirmBooking}>
                     <Text style={style.confirmButtonText}>Confirm</Text>
@@ -297,6 +310,27 @@ const style = StyleSheet.create({
     top: 10,
     right: 10,
     zIndex: 1,
+  },
+  ratingInput: {
+    height: 40,
+    borderWidth: 1,
+    borderColor: COLORS.grey,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    marginTop: 20,
+  },
+  submitButton: {
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: COLORS.primary,
+    borderRadius: 10,
+    marginTop: 20,
+  },
+  submitButtonText: {
+    color: COLORS.white,
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 
 });

@@ -12,7 +12,8 @@ import { View, Text } from 'react-native';
 import axios from 'axios';
 import useFetch from './src/hooks/useFetch';
 import { AuthContextProvider } from './src/context/AuthContext';
-import {  SearchProvider } from './src/context/SearchContext';
+import { SearchProvider } from './src/context/SearchContext';
+import BookingConfirmationScreen from './src/views/screens/BookingConfirmationScreen';
 
 
 const Stack = createNativeStackNavigator();
@@ -56,14 +57,16 @@ const App = () => {
               <Stack.Navigator
                 initialRouteName={initialRouteName}
                 screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="LoginScreen" component={LoginScreen} />
                 <Stack.Screen
                   name="RegistrationScreen"
                   component={RegistrationScreen}
                 />
-                <Stack.Screen name="LoginScreen" component={LoginScreen} />
                 <Stack.Screen name="HomeScreen" component={HomeScreen} />
                 <Stack.Screen name="DetailsScreen" component={DetailsScreen} />
+                <Stack.Screen name="BookingConfirmationScreen" component={BookingConfirmationScreen} />
                 <Stack.Screen name="ListScreen" component={ListScreen} />
+                
               </Stack.Navigator>
             </>
           )}
