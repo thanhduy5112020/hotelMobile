@@ -19,6 +19,8 @@ import com.reactnativecommunity.checkbox.ReactCheckBoxPackage;
 import com.th3rdwave.safeareacontext.SafeAreaContextPackage;
 // react-native-screens
 import com.swmansion.rnscreens.RNScreensPackage;
+// react-native-svg
+import com.horcrux.svg.SvgPackage;
 // react-native-vector-icons
 import com.oblador.vectoricons.VectorIconsPackage;
 
@@ -70,6 +72,7 @@ public class PackageList {
       new ReactCheckBoxPackage(),
       new SafeAreaContextPackage(),
       new RNScreensPackage(),
+      new SvgPackage(),
       new VectorIconsPackage()
     ));
   }

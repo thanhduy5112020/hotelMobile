@@ -1,26 +1,40 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
 import COLORS from '../../conts/colors';
+import axios from 'axios';
 
-const BookingConfirmation = ({ navigation, user, hotel, roomType, numberOfRooms, checkInDate, checkOutDate, totalPrice }) => {
+const BookingConfirmation = ({ navigation, user, hotel, roomType, numberOfRooms, checkInDate, checkOutDate, totalPrice, dataHotel }) => {
   const [rating, setRating] = useState(10);
   const [paymentMethod, setPaymentMethod] = useState('');
-
   const handleRatingChange = (value) => {
     setRating(value);
   };
-
   const handleSubmitRating = (value) => {
 
-    const inputValue = parseInt(value, 10);
-    console.log('Rating:', inputValue);
+
     if (rating >= 0 && rating <= 10) {
-      Alert.alert('My love !', 'Thank you for choosing our hotel!');
-      navigation.navigate('HomeScreen');
+      const updatedTotalReviews = dataHotel.totalReviews + 1;
+      const updatedTotal = dataHotel.total + totalPrice;
+      const updatedRating = ((parseFloat(dataHotel.rating) * parseFloat(dataHotel.totalReviews) + parseFloat(rating)) / parseFloat(updatedTotalReviews)).toFixed(1);
+      // Tạo đối tượng dữ liệu để gửi đi
+      const updatedData = {
+        totalReviews: updatedTotalReviews,
+        total: updatedTotal,
+        rating: updatedRating,
+      };
+    
+      try {
+        console.log(dataHotel._id)
+        const res = axios.put(`http://10.3.54.108:3000/api/hotels/${dataHotel._id}`, updatedData)
+        // console.log("res ", res)
+        Alert.alert('My love !', 'Thank you for choosing our hotel!');
+        navigation.navigate('HomeScreen');
+      } catch (err) {
+        Alert.alert('My love !', err);
+      }
     } else {
       Alert.alert('My love !', 'Rating from 0 to 10 !!!');
     }
-
   };
 
   const handlePaymentMethodChange = (method) => {

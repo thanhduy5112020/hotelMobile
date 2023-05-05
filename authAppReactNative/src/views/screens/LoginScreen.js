@@ -33,18 +33,6 @@ const LoginScreen = ({ navigation }) => {
 
     if (isValid) {
       login();
-      // const payload = {
-      //   username: inputs.email,
-      //   password: inputs.password,
-      // };
-
-      // try {
-      //   const response = await postData('api/auth/login', payload);
-      //   navigation.navigate('HomeScreen');
-      //   console.log("response ", response)
-      // } catch (err) {
-      //   Alert.alert("Failure", "Try again !");
-      // }
 
     }
   };
@@ -63,6 +51,7 @@ const LoginScreen = ({ navigation }) => {
     console.log("paload ", payload)
     try {
 
+     
       dispatch({ type: 'LOGIN_START' });
 
       const response = await postData('api/auth/login', payload);
@@ -71,7 +60,11 @@ const LoginScreen = ({ navigation }) => {
       dispatch({ type: 'LOGIN_SUCCESS', payload: response.details });
 
   
-      navigation.navigate('HomeScreen');
+      if (payload.username === "admin") {
+        navigation.navigate('HomeTab');
+      } else {
+        navigation.navigate('HomeScreen');
+      }
       
     } catch (err) {
   
@@ -106,8 +99,8 @@ const LoginScreen = ({ navigation }) => {
             onChangeText={text => handleOnchange(text, 'email')}
             onFocus={() => handleError(null, 'email')}
             iconName="email-outline"
-            label="Email"
-            placeholder="Enter your email address"
+            label="Usename"
+            placeholder="Enter your Username"
             error={errors.email}
           />
           <Input

@@ -14,12 +14,29 @@ import useFetch from './src/hooks/useFetch';
 import { AuthContextProvider } from './src/context/AuthContext';
 import { SearchProvider } from './src/context/SearchContext';
 import BookingConfirmationScreen from './src/views/screens/BookingConfirmationScreen';
+import AdminScreen from './src/views/screens/AdminScreen';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import UserScreen from './src/views/adScreen/UserScreen';
+import HotelScreen from './src/views/adScreen/HotelScreen';
+import Cleaner from './src/views/adScreen/Cleaner';
 
 
 const Stack = createNativeStackNavigator();
 
+const Tab = createBottomTabNavigator();
+function MyTabs() {
+  return (
+    <Tab.Navigator screenOptions={{headerShown: false}}>
+      <Tab.Screen name="AdminScreen" component={AdminScreen} />
+      <Tab.Screen name="User" component={UserScreen} />
+      <Tab.Screen name="Hotel" component={HotelScreen} />
+      <Tab.Screen name="Cleaner" component={Cleaner} />
+    </Tab.Navigator>
+  );
+}
+
 const App = () => {
-  const [initialRouteName, setInitialRouteName] = React.useState('');
+  const [initialRouteName, setInitialRouteName] = React.useState('LoginScreen');
 
 
   React.useEffect(() => {
@@ -42,7 +59,8 @@ const App = () => {
         setInitialRouteName('RegistrationScreen');
       }
     } catch (error) {
-      setInitialRouteName('RegistrationScreen');
+      setInitialRouteName('LoginScreen');
+      // setInitialRouteName('RegistrationScreen');
     }
   };
 
@@ -66,6 +84,8 @@ const App = () => {
                 <Stack.Screen name="DetailsScreen" component={DetailsScreen} />
                 <Stack.Screen name="BookingConfirmationScreen" component={BookingConfirmationScreen} />
                 <Stack.Screen name="ListScreen" component={ListScreen} />
+                <Stack.Screen name="HomeTab" component={MyTabs} />
+                {/* <Stack.Screen name="AdminScreen" component={AdminScreen} /> */}
                 
               </Stack.Navigator>
             </>

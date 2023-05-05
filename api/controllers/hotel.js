@@ -298,6 +298,103 @@ export const getTopRatedHotels = async (req, res) => {
     }
 };
 
+export const calculateTotal = async (req, res) => {
+    try {
+        const hotels = await Hotel.find();
+        let total = 0;
+
+        hotels.forEach((hotel) => {
+            total += hotel.total;
+        });
+
+        return res.status(200).json({ total });
+    } catch (error) {
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+export const calculateAverageRating = async (req, res) => {
+    try {
+        const hotels = await Hotel.find();
+        let totalRating = 0;
+        let count = 0;
+
+        hotels.forEach((hotel) => {
+            totalRating += hotel.rating;
+            count++;
+        });
+
+        const averageRating = totalRating / count;
+        const roundedRating = Math.round(averageRating * 10) / 10; // Làm tròn đến chữ số thập phân thứ nhất
+
+        return res.status(200).json({ averageRating: roundedRating });
+    } catch (error) {
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+export const findHotelWithMaxRevenue = async (req, res) => {
+    try {
+
+        const hotels = await Hotel.find().sort({ total: -1 }).limit(1);
+
+        if (hotels.length === 0) {
+            return res.status(404).json({ message: 'No hotels found' });
+        }
+
+        const hotel = hotels[0];
+        const { name, total } = hotel;
+
+        return res.status(200).json({ name, total });
+    } catch (error) {
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+export const findTopHotelsByTotal = async (req, res) => {
+    try {
+      const hotels = await Hotel.find();
+      const totalSum = hotels.reduce((sum, hotel) => sum + hotel.total, 0);
+      const sortedHotels = hotels.sort((a, b) => b.total - a.total).slice(0, 4);
+  
+      const result = sortedHotels.map((hotel) => ({
+        name: hotel.name,
+        amount: hotel.total,
+      }));
+  
+      const remainingTotal = totalSum - result.reduce((sum, hotel) => sum + hotel.amount, 0);
+      result.push({ name: 'Remaining', amount: remainingTotal });
+  
+      return res.status(200).json(result);
+    } catch (error) {
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+  };
+
+  export const calculateTotalByType = async (req, res) => {
+    try {
+      const result = await Hotel.aggregate([
+        {
+          $group: {
+            _id: '$type',
+            total: { $sum: '$total' },
+          },
+        },
+      ]);
+  
+      return res.status(200).json(result);
+    } catch (error) {
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+  };
+  
+  
+  
+
+
+
+
+
 
 
 

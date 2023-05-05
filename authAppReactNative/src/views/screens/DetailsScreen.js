@@ -30,7 +30,7 @@ const DetailsScreen = ({ navigation, route }) => {
   const toggleVisibility = () => {
     setVisible(!visible);
   };
-
+  const dataHotel = item
   const confirmBooking = async () => {
     try {
       await Promise.all(
@@ -44,7 +44,7 @@ const DetailsScreen = ({ navigation, route }) => {
         })
       );
       setVisible(!visible);
-      navigation.navigate('BookingConfirmationScreen',  { confirm: { user, dateRange, nameHotel, totalMount, selectedRoomDetails} });
+      navigation.navigate('BookingConfirmationScreen',  { confirm: { user, dateRange, nameHotel, totalMount, selectedRoomDetails, dataHotel} });
      
 
     }

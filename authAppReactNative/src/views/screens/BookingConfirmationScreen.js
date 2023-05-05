@@ -4,7 +4,7 @@ import BookingConfirmation from '../components/BookingConfirmation';
 
 const BookingConfirmationScreen = ({ navigation, route }) => {
   console.log(route.params.confirm)
-  const { dateRange, user, nameHotel,totalMount, selectedRoomDetails} = route.params.confirm;
+  const { dateRange, user, nameHotel,totalMount, selectedRoomDetails, dataHotel} = route.params.confirm;
   console.log("selectedRoomDetails BookingConfirmationScreen", selectedRoomDetails[0])
   // const user = "Yue"
   const hotel = nameHotel;
@@ -24,6 +24,7 @@ const BookingConfirmationScreen = ({ navigation, route }) => {
       checkInDate={checkInDate}
       checkOutDate={checkOutDate}
       totalPrice={totalPrice}
+      dataHotel = {dataHotel}
     />
   );
 };

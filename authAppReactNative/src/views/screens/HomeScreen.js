@@ -184,14 +184,14 @@ const HomeScreen = ({ navigation }) => {
         <Animated.View style={{ ...style.card, transform: [{ scale }] }}>
           <Animated.View style={{ ...style.cardOverLay, opacity }} />
           <View style={style.priceTag}>
-            {hotel.rating ? 
-            <Text
-              style={{ color: COLORS.white, fontSize: 20, fontWeight: 'bold' }}>
-              {hotel.rating}
-            </Text> : <Text
-              style={{ color: COLORS.white, fontSize: 20, fontWeight: 'bold' }}>
-              8.0
-            </Text>}
+            {hotel.rating ?
+              <Text
+                style={{ color: COLORS.white, fontSize: 20, fontWeight: 'bold' }}>
+                {hotel.rating}
+              </Text> : <Text
+                style={{ color: COLORS.white, fontSize: 20, fontWeight: 'bold' }}>
+                8.0
+              </Text>}
           </View>
           <Image source={{ uri: hotel.photos[0] }} style={style.cardImage} />
           <View style={style.cardDetails}>
@@ -220,7 +220,7 @@ const HomeScreen = ({ navigation }) => {
                   ))
                 }
               </View>
-              <Text style={{ fontSize: 10, color: COLORS.grey }}>365reviews</Text>
+              <Text style={{ fontSize: 10, color: COLORS.grey }}>{hotel.totalReviews} reviews</Text>
             </View>
           </View>
         </Animated.View>
@@ -240,9 +240,10 @@ const HomeScreen = ({ navigation }) => {
             zIndex: 1,
             flexDirection: 'row',
           }}>
-          <Icon name="star" size={15} color={COLORS.orange} />
+          {/* <Icon name="star" size={15} color={COLORS.orange} /> */}
+          <Icon name="bookmark-border" size={26} color={COLORS.orange} />
           <Text style={{ color: COLORS.white, fontWeight: 'bold', fontSize: 15 }}>
-            {types[index]} star
+            {hotel.rating} Rating
           </Text>
 
         </View>
@@ -272,10 +273,9 @@ const HomeScreen = ({ navigation }) => {
           </Text>
         </View>
         <View style={style.userInfo}>
-          <Icon name="person-outline" size={38} color={COLORS.grey} />
+          <Image source={{ uri: user?.img }} style={style.userImage} />
           <Text style={style.username}>{user?.username}</Text>
         </View>
-
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -516,6 +516,11 @@ const style = StyleSheet.create({
     marginTop: 10,
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  userImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
   },
 
 });

@@ -35,7 +35,8 @@ const HotelSchema = new mongoose.Schema({
     rating: {
         type: Number,
         min: 0,
-        max: 10
+        max: 10,
+        default: 8.0
     },
     rooms: {
         type: [String],
@@ -48,10 +49,14 @@ const HotelSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    total:{
-        type:Number,
-        default: 0
-    }
+    total: {
+        type: Number,
+        default: 10
+    },
+    totalReviews: {
+        type: Number,
+        default: 1,
+    },
 })
 
 export default mongoose.model("Hotel", HotelSchema)
