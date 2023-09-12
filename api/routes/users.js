@@ -5,7 +5,7 @@ import { verifyToken, verifyUser, verifyAdmin} from "../utils/verifyToken.js";
 const router = express.Router();
 
 router.get("/checkauthentication", verifyToken, (req, res, next) => {
-    res.send("Hello user, you are logged in")
+    res.send("Hello user, you are logged in3")
 })
 
 router.get("/checkuser/:id", verifyUser, (req, res, next) => {

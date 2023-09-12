@@ -10,7 +10,7 @@ const SearchItem = ({ item, navigation}) => {
         <Text style={styles.siDistance}>{item?.distance} m from centre {item?.city}</Text>
         <Text style={styles.siTaxiOp}>{item?.type}</Text>
         <Text style={styles.siSubtitle}>
-          Studio Apartment with Air conditioning
+          Reviews: {item?.totalReviews}
         </Text>
         <View style={styles.siCancelOp}>
           <Text style={styles.siCancelOpText}>Free cancellation</Text>

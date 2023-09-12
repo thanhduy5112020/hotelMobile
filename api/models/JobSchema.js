@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
 
@@ -14,7 +13,8 @@ const JobSchema = new Schema({
     type: String,
   },
   scheduledTime: {
-    type: Date,
+    type: String,
+    default: "2023-05-05"
   },
  
 });

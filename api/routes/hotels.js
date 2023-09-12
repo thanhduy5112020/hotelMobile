@@ -1,5 +1,5 @@
 import express from "express";
-import { createHotel, deleteHotel, getHotel, getHotels, updateHotel,countByCity, countByType, getHotelRooms, countByHotel, sumRevenueByHotel, sumByType, searchHotelByLocation, searchHotelsByPriceRange, getTopRatedHotels, calculateTotal, calculateAverageRating, findHotelWithMaxRevenue, findTopHotelsByTotal, calculateTotalByType } from "../controllers/hotel.js";
+import { createHotel, deleteHotel, getHotel, getHotels, updateHotel,countByCity, countByType, getHotelRooms, countByHotel, sumRevenueByHotel, sumByType, searchHotelByLocation, searchHotelsByPriceRange, getTopRatedHotels, calculateTotal, calculateAverageRating, findHotelWithMaxRevenue, findTopHotelsByTotal, calculateTotalByType, searchHotelByType } from "../controllers/hotel.js";
 import { verifyAdmin, verifyToken} from "../utils/verifyToken.js";
 import { createError } from "../utils/error.js";
 
@@ -31,6 +31,7 @@ router.get("/calculateAverageRating", calculateAverageRating)
 router.get("/findHotelWithMaxRevenue", findHotelWithMaxRevenue)
 router.get("/findTopHotelsByTotal", findTopHotelsByTotal)
 router.get("/calculateTotalByType", calculateTotalByType)
+router.get("/searchHotelByType", searchHotelByType)
 
 
 export default router

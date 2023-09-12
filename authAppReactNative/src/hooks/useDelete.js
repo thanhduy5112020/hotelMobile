@@ -3,15 +3,15 @@ import axios from 'axios';
 
 const iplink = "http://172.27.0.1:3000/";
 
-const usePost = () => {
+const useDelete = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const link = iplink;
 
-  const postData = async (url, payload) => {
+  const deleteData = async (url) => {
     setLoading(true);
     try {
-      const res = await axios.post(link + url, payload);
+      const res = await axios.delete(link + url);
       return res.data;
     } catch (err) {
       setError(err);
@@ -21,7 +21,7 @@ const usePost = () => {
     }
   };
 
-  return { loading, error, postData };
+  return { loading, error, deleteData };
 };
 
-export default usePost;
+export default useDelete;

@@ -19,6 +19,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import UserScreen from './src/views/adScreen/UserScreen';
 import HotelScreen from './src/views/adScreen/HotelScreen';
 import Cleaner from './src/views/adScreen/Cleaner';
+import AddRoomScreen from './src/views/adScreen/AddRoomScreen';
+import JobList from './src/views/adScreen/JobList';
 
 
 const Stack = createNativeStackNavigator();
@@ -31,6 +33,7 @@ function MyTabs() {
       <Tab.Screen name="User" component={UserScreen} />
       <Tab.Screen name="Hotel" component={HotelScreen} />
       <Tab.Screen name="Cleaner" component={Cleaner} />
+      <Tab.Screen name="JobList" component={JobList} />
     </Tab.Navigator>
   );
 }
@@ -85,7 +88,7 @@ const App = () => {
                 <Stack.Screen name="BookingConfirmationScreen" component={BookingConfirmationScreen} />
                 <Stack.Screen name="ListScreen" component={ListScreen} />
                 <Stack.Screen name="HomeTab" component={MyTabs} />
-                {/* <Stack.Screen name="AdminScreen" component={AdminScreen} /> */}
+                <Stack.Screen name="AddRoomScreen" component={AddRoomScreen} />
                 
               </Stack.Navigator>
             </>

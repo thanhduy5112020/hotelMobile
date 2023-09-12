@@ -15,6 +15,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { AuthContext } from '../../context/AuthContext';
 import SearchItem from '../components/SearchItem';
 import useFetch from '../../hooks/useFetch';
+import StarFilter from '../components/StarFilter';
 
 const { width } = Dimensions.get('screen');
 const cardWidth = width / 1.8;
@@ -24,10 +25,39 @@ const ListScreen = ({ navigation, route }) => {
     const { user } = React.useContext(AuthContext);
     const [minPrice, setMinPrice] = React.useState(0);
     const [maxPrice, setMaxPrice] = React.useState(999999);
+    const [rating, setRating] = React.useState(0);
+    const [review, setReview] = React.useState(0);
+    const [selectedStar, setSelectedStar] = React.useState(null);
+    const [queryStringq, setQueryStringq] = React.useState('')
 
-    const queryString = `api/hotels/searchHotelByLocation?city=${destination}&minPrice=${minPrice}&maxPrice=${maxPrice}`;
-    // const queryString = `api/hotels/searchHotelByLocation?city=Ha Noi`;
-    const { data: dataSearch, loading: dataSearchLoading, error: dataSearchError } = useFetch(queryString);
+    const handleSelectedStar = (star) => {
+        setSelectedStar(star);
+    };
+
+    // if (selectedStar) {
+    //     setQueryStringq(`api/hotels/searchHotelByLocation?city=${destination}&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=${rating}&review=${review}`)
+    // } else {
+    //     setQueryStringq(`api/hotels/searchHotelByLocation?city=${destination}&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=${rating}&review=${review}&type=${selectedStar}`)
+    // }
+
+    // // const queryString = `api/hotels/searchHotelByLocation?city=${destination}&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=${rating}&review=${review}`;
+    // const { data: dataSearch, loading: dataSearchLoading, error: dataSearchError, reFetch } = useFetch(queryStringq);
+    React.useEffect(() => {
+        if (selectedStar) {
+            setQueryStringq(`api/hotels/searchHotelByLocation?city=${destination}&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=${rating}&review=${review}&type=${selectedStar}`);
+            reFetch()
+        } else {
+            setQueryStringq(`api/hotels/searchHotelByLocation?city=${destination}&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=${rating}&review=${review}`);
+            reFetch()
+        }
+      
+    }, [destination, minPrice, maxPrice, rating, review, selectedStar]);
+
+    const { data: dataSearch, loading: dataSearchLoading, error: dataSearchError, reFetch } = useFetch(queryStringq );
+
+
+    console.log("selectedStar ", selectedStar)
+
 
     return (
 
@@ -66,19 +96,34 @@ const ListScreen = ({ navigation, route }) => {
                         value={maxPrice}
                         onChangeText={setMaxPrice}
                     />
-                </View>
-            </View>
-
-
-            <ScrollView>
-                <View style={styles.container}>
-                    <FlatList
-                        data={dataSearch}
-                        renderItem={({ item }) => <SearchItem item={item} navigation={navigation} />}
-                        keyExtractor={(item) => item?._id.toString()}
+                    <TextInput
+                        style={{ flex: 1, marginRight: 5 }}
+                        placeholder="Rating"
+                        value={rating}
+                        onChangeText={setRating}
+                    />
+                    <TextInput
+                        style={{ flex: 1, marginRight: 5 }}
+                        placeholder="Review"
+                        value={review}
+                        onChangeText={setReview}
                     />
                 </View>
-            </ScrollView>
+
+            </View>
+
+            <StarFilter selectedStar={selectedStar} handleSelectedStar={handleSelectedStar} />
+
+
+            <View style={styles.container}>
+                <FlatList
+                    data={dataSearch}
+                    renderItem={({ item }) => <SearchItem item={item} navigation={navigation} />}
+                    keyExtractor={(item) => item?._id.toString()}
+                    contentContainerStyle={{ paddingBottom: 500 }}
+                />
+            </View>
+
 
 
         </SafeAreaView>

@@ -15,6 +15,7 @@ import {
 import COLORS from '../../conts/colors';
 import useFetch from '../../hooks/useFetch';
 import { AuthContext } from '../../context/AuthContext';
+import axios from 'axios';
 
 const { width } = Dimensions.get('screen');
 const cardWidth = width / 1.8;
@@ -22,6 +23,7 @@ const cardWidth = width / 1.8;
 const HotelScreen = ({ navigation }) => {
   const { data: hotelData, loading: hotelLoading, error: hotelError } = useFetch('api/hotels');
   const { user } = React.useContext(AuthContext);
+  console.log(navigation)
   const handleDeleteHotel = (hotelId) => {
     // Implement your delete logic here
     // You can show an alert or confirmation dialog before deleting the hotel
@@ -35,16 +37,26 @@ const HotelScreen = ({ navigation }) => {
         style: 'destructive',
         onPress: () => {
           // Perform the delete operation
+          axios.delete(`http://192.168.43.237:3000/api/hotels/${hotelId}`)
+          navigation.navigate("AdminScreen")
           console.log('Deleting hotel with id:', hotelId);
         },
       },
     ]);
   };
 
+  // const iplink = "http://10.3.54.108:3000/";
+
   const handleEditHotel = (hotelId) => {
-    // Implement your edit logic here
-    // You can navigate to the edit hotel screen or show a modal for editing
+
     console.log('Editing hotel with id:', hotelId);
+  };
+
+  const handleAddHotel = () => {
+    // Xử lý sự kiện khi nhấn vào nút "Thêm khách sạn"
+    console.log('Add hotel clicked');
+    navigation.navigate("AddRoomScreen")
+    
   };
 
   const renderHotelItem = ({ item }) => (
@@ -58,13 +70,13 @@ const HotelScreen = ({ navigation }) => {
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={styles.button}
-          onPress={() => handleDeleteHotel(item.id)}
+          onPress={() => handleDeleteHotel(item._id)}
         >
           <Text style={styles.buttonText}>Delete</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.buttonEdit}
-          onPress={() => handleEditHotel(item.id)}
+          onPress={() => handleEditHotel(item._id)}
         >
           <Text style={styles.buttonText}>Edit</Text>
         </TouchableOpacity>
@@ -85,20 +97,22 @@ const HotelScreen = ({ navigation }) => {
           <Text style={{ fontSize: 30, fontWeight: 'bold' }}>
             Hotel Page
           </Text>
+          <TouchableOpacity style={styles.addButton} onPress={handleAddHotel}>
+            <Text style={styles.addButtonText}>Add Hotel</Text>
+          </TouchableOpacity>
         </View>
         <View style={styles.userInfo}>
-
           <Image source={{ uri: user?.img }} style={styles.userImage} />
           <Text style={styles.username}>Admin</Text>
         </View>
       </View>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      {/* <ScrollView showsVerticalScrollIndicator={false}> */}
         <FlatList
           data={hotelData}
           keyExtractor={(item) => item._id.toString()}
           renderItem={renderHotelItem}
         />
-      </ScrollView>
+      {/* </ScrollView> */}
     </SafeAreaView>
   );
 };
@@ -172,6 +186,18 @@ const styles = StyleSheet.create({
   username: {
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  addButton: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    backgroundColor: 'dodgerblue',
+    borderRadius: 5,
+    marginRight: 10,
+  },
+  addButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center'
   },
 });
 

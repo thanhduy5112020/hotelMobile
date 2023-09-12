@@ -17,7 +17,7 @@ const cardWidth = width / 1.8;
 
 const Cleaner = ({ navigation }) => {
 
-    const { data: userData, loading: userLoading, error: userError } = useFetch("api/users")
+    const { data: userData, loading: userLoading, error: userError } = useFetch("api/cleaners")
     console.log("userData ", userData)
     const { user } = React.useContext(AuthContext);
 
@@ -49,11 +49,10 @@ const Cleaner = ({ navigation }) => {
 
     const renderUserItem = ({ item }) => (
         <View style={style.userItem}>
-            <Image source={{ uri: item.img }} style={style.userImage} />
+            {/* <Image source={{ uri: item.img }} style={style.userImage} /> */}
             <View style={style.userInfoContainer}>
-                <Text style={style.username}>{item.username}</Text>
-                <Text style={style.userEmail}>{item.email}</Text>
-                <Text style={style.userCountry}>{item.phone}</Text>
+                <Text style={style.username}>{item?.name}</Text>
+                <Text style={style.userEmail}>Work Place: {item?.workplace}</Text>
             </View>
             <View style={style.buttonContainer}>
                 <TouchableOpacity style={style.button} onPress={() => handleDeleteUser(item.id)}>
@@ -88,15 +87,12 @@ const Cleaner = ({ navigation }) => {
                 </View>
             </View>
 
-            <ScrollView showsVerticalScrollIndicator={false}>
-                {/* <Navbar/> */}
                 <FlatList
                     data={userData}
                     keyExtractor={(item) => item._id.toString()}
                     renderItem={renderUserItem}
                 />
 
-            </ScrollView>
 
         </SafeAreaView>
     );

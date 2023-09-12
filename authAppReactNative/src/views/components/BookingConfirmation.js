@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
 import COLORS from '../../conts/colors';
 import axios from 'axios';
+import useFetch from '../../hooks/useFetch';
+import usePost from '../../hooks/usePost';
 
 const BookingConfirmation = ({ navigation, user, hotel, roomType, numberOfRooms, checkInDate, checkOutDate, totalPrice, dataHotel }) => {
   const [rating, setRating] = useState(10);
@@ -9,8 +11,10 @@ const BookingConfirmation = ({ navigation, user, hotel, roomType, numberOfRooms,
   const handleRatingChange = (value) => {
     setRating(value);
   };
+  const { data: cleanerData, loading: cleanerLoading, error: cleanerError } = useFetch('api/cleaners/getCleanerByHotelName');
+  const { loading: loadingUser, error, postData } = usePost();
+  console.log("cleanerData ", cleanerData)
   const handleSubmitRating = (value) => {
-
 
     if (rating >= 0 && rating <= 10) {
       const updatedTotalReviews = dataHotel.totalReviews + 1;
@@ -22,11 +26,27 @@ const BookingConfirmation = ({ navigation, user, hotel, roomType, numberOfRooms,
         total: updatedTotal,
         rating: updatedRating,
       };
-    
+
+      const jobData = {
+        nameCleaner: cleanerData?.name,
+        roomNumber: numberOfRooms,
+        nameHotel: hotel,
+        scheduledTime: checkOutDate
+      }
+      console.log("jobData ", jobData)
+      const totalWorkUpdate = cleanerData?.totalwork + 1
+      console.log("totalWorkUpdate ", totalWorkUpdate)
+      // console.log("dataHotel ", typeof dataHotel._id )
+      const hotelid = dataHotel._id
+      const cleanerid = cleanerData?._id
       try {
-        console.log(dataHotel._id)
-        const res = axios.put(`http://10.3.54.108:3000/api/hotels/${dataHotel._id}`, updatedData)
-        // console.log("res ", res)
+        console.log("dataHotel 2", hotelid )
+        
+        const res = axios.put(`http://192.168.43.237:3000/api/hotels/${hotelid}`, updatedData)
+        postData('api/job/', jobData);
+        // const res1 = axios.put(`http://192.168.43.237:3000/api/cleaners/${cleanerid}`, totalWorkUpdate)
+        // const res1 = axios.put(`http://192.168.43.237:3000/api/cleaners/6454de7fcac5091025cff522`, totalWorkUpdate)
+        // console.log("cleanerData?._id ", cleanerData?._id)
         Alert.alert('My love !', 'Thank you for choosing our hotel!');
         navigation.navigate('HomeScreen');
       } catch (err) {

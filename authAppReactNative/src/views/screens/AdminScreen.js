@@ -38,6 +38,7 @@ const AdminScreen = ({ navigation }) => {
   const { data: dataPie, loading: loadingPie, error: errorPie } = useFetch("api/hotels/findTopHotelsByTotal")
   const { data: dataBar, loading: loadingBar, error: errorBar } = useFetch("api/hotels/calculateTotalByType")
   console.log(dataPie[0]?.amount)
+  const datatest = dataPie[0]?.amount
   console.log(dataTotal)
 
   const data1 = [
@@ -111,7 +112,7 @@ const AdminScreen = ({ navigation }) => {
         <View style={style.chartContainer}>
           <Text style={style.chartTitle}>Revenue By Type</Text>
           {
-            dataPie != undefined ? <View style={style.chart}>
+            datatest != undefined  ? <View style={style.chart}>
             <BarChart
               style={style.graphStyle}
               data={data2}
@@ -143,9 +144,9 @@ const AdminScreen = ({ navigation }) => {
             />
           </View>:<></>
           }
-         
         </View>
         <Text ></Text>
+        
         <Text style={style.chartTitle}>Total Revenue:
           <Text style={{ fontWeight: 'normal', color: 'green' }}> {dataTotal?.total} $</Text>
         </Text>

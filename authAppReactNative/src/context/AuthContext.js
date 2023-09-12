@@ -48,6 +48,7 @@ export const AuthContextProvider = ({ children }) => {
     const getUserData = async () => {
       try {
         const userData = await AsyncStorage.getItem('user');
+        
         console.log("user data ", userData)
         if (userData) {
           dispatch({ type: "LOGIN_SUCCESS", payload: JSON.parse(userData) });

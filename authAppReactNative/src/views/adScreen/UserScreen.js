@@ -88,7 +88,7 @@ const UserScreen = ({ navigation }) => {
                 </View>
             </View>
 
-            <ScrollView showsVerticalScrollIndicator={false}>
+            {/* <ScrollView showsVerticalScrollIndicator={false}> */}
                 {/* <Navbar/> */}
                 <FlatList
                     data={userData}
@@ -96,7 +96,7 @@ const UserScreen = ({ navigation }) => {
                     renderItem={renderUserItem}
                 />
 
-            </ScrollView>
+            {/* </ScrollView> */}
 
         </SafeAreaView>
     );

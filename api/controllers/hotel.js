@@ -213,9 +213,78 @@ export const sumRevenueByHotel = async (req, res, next) => {
 }
 
 
+// export const searchHotelByLocation = async (req, res) => {
+//     const { city, minPrice, maxPrice, rating, review } = req.query;
+//     // const query = { city: { $regex: city, $options: 'i' } };
+//     // const typeQuery = req.query.type ? { type: getType(req.query.type) } : {};
+//     const query = { city: { $regex: city, $options: 'i' }};
+
+//     // Thêm điều kiện tìm kiếm theo minPrice và maxPrice nếu được cung cấp
+//     if (minPrice && maxPrice) {
+//         query.cheapestPrice = { $gte: minPrice, $lte: maxPrice };
+//     } else if (minPrice) {
+//         query.cheapestPrice = { $gte: minPrice };
+//     } else if (maxPrice) {
+//         query.cheapestPrice = { $lte: maxPrice };
+//     }
+
+//     if (rating) {
+//         query.rating = { $gte: rating };
+//     }
+//     if (review) {
+//         query.totalReviews = { $gte: review };
+//     }
+
+//     try {
+//         const hotels = await Hotel.find(query);
+
+//         if (hotels.length === 0) {
+//             return res.status(404).json({ message: 'Không tìm thấy khách sạn nào.' });
+//         }
+
+//         return res.status(200).json(hotels);
+//     } catch (error) {
+//         return res.status(500).json({ message: 'Có lỗi xảy ra khi tìm kiếm khách sạn.' });
+//     }
+// };
+
+// export const searchHotelByLocation = async (req, res) => {
+//     const { city, minPrice, maxPrice, rating, review } = req.query;
+//     const typeQuery = req.query.type ? { type: getType(req.query.type) } : {};
+//     const query = { city: { $regex: city, $options: 'i' }, ...typeQuery };
+
+//     // Thêm điều kiện tìm kiếm theo minPrice và maxPrice nếu được cung cấp
+//     if (minPrice && maxPrice) {
+//         query.cheapestPrice = { $gte: minPrice, $lte: maxPrice };
+//     } else if (minPrice) {
+//         query.cheapestPrice = { $gte: minPrice };
+//     } else if (maxPrice) {
+//         query.cheapestPrice = { $lte: maxPrice };
+//     }
+//     console.log(query)
+
+//     try {
+//         const hotels = await Hotel.find(query);
+
+//         if (hotels.length === 0) {
+//             return res.status(404).json({ message: 'Không tìm thấy khách sạn nào.' });
+//         }
+
+//         return res.status(200).json(hotels);
+//     } catch (error) {
+//         return res.status(500).json({ message: 'Có lỗi xảy ra khi tìm kiếm khách sạn.' });
+//     }
+// };
+
 export const searchHotelByLocation = async (req, res) => {
-    const { city, minPrice, maxPrice } = req.query;
-    const query = { city: { $regex: city, $options: 'i' } };
+    const { city, minPrice, maxPrice, rating, review, type } = req.query;
+    const query = {
+        city: { $regex: city, $options: 'i' },
+    };
+
+    if (type) {
+        query.type = getType(type);
+    }
 
     // Thêm điều kiện tìm kiếm theo minPrice và maxPrice nếu được cung cấp
     if (minPrice && maxPrice) {
@@ -224,6 +293,13 @@ export const searchHotelByLocation = async (req, res) => {
         query.cheapestPrice = { $gte: minPrice };
     } else if (maxPrice) {
         query.cheapestPrice = { $lte: maxPrice };
+    }
+
+    if (rating) {
+        query.rating = { $gte: rating };
+    }
+    if (review) {
+        query.totalReviews = { $gte: review };
     }
 
     try {
@@ -239,15 +315,30 @@ export const searchHotelByLocation = async (req, res) => {
     }
 };
 
+// Hàm lấy loại khách sạn từ query
+const getType = (queryType) => {
+    const typeMap = {
+        '1': 'One Star',
+        '2': 'Two Star',
+        '3': 'Three Star',
+        '4': 'Four Star',
+        '5': 'Five Star'
+    };
+    return typeMap[queryType] || '';
+};
+
+
+
+
 
 
 
 export const searchHotelsByPriceRange = async (req, res) => {
-    const { minPrice, maxPrice } = req.query;
+    const { minPrice, maxPrice, rating, review } = req.query;
 
     try {
         const hotels = await Hotel.find({
-            cheapestPrice: { $gte: minPrice, $lte: maxPrice },
+            cheapestPrice: { $gte: minPrice, $lte: maxPrice, $gte: rating, $gte: review },
         }).exec();
 
         // Kiểm tra nếu không tìm thấy khách sạn
@@ -353,43 +444,84 @@ export const findHotelWithMaxRevenue = async (req, res) => {
 
 export const findTopHotelsByTotal = async (req, res) => {
     try {
-      const hotels = await Hotel.find();
-      const totalSum = hotels.reduce((sum, hotel) => sum + hotel.total, 0);
-      const sortedHotels = hotels.sort((a, b) => b.total - a.total).slice(0, 4);
-  
-      const result = sortedHotels.map((hotel) => ({
-        name: hotel.name,
-        amount: hotel.total,
-      }));
-  
-      const remainingTotal = totalSum - result.reduce((sum, hotel) => sum + hotel.amount, 0);
-      result.push({ name: 'Remaining', amount: remainingTotal });
-  
-      return res.status(200).json(result);
-    } catch (error) {
-      return res.status(500).json({ error: 'Internal server error' });
-    }
-  };
+        const hotels = await Hotel.find();
+        const totalSum = hotels.reduce((sum, hotel) => sum + hotel.total, 0);
+        const sortedHotels = hotels.sort((a, b) => b.total - a.total).slice(0, 4);
 
-  export const calculateTotalByType = async (req, res) => {
-    try {
-      const result = await Hotel.aggregate([
-        {
-          $group: {
-            _id: '$type',
-            total: { $sum: '$total' },
-          },
-        },
-      ]);
-  
-      return res.status(200).json(result);
+        const result = sortedHotels.map((hotel) => ({
+            name: hotel.name,
+            amount: hotel.total,
+        }));
+
+        const remainingTotal = totalSum - result.reduce((sum, hotel) => sum + hotel.amount, 0);
+        result.push({ name: 'Remaining', amount: remainingTotal });
+
+        return res.status(200).json(result);
     } catch (error) {
-      return res.status(500).json({ error: 'Internal server error' });
+        return res.status(500).json({ error: 'Internal server error' });
     }
-  };
-  
-  
-  
+};
+
+export const calculateTotalByType = async (req, res) => {
+    try {
+        const result = await Hotel.aggregate([
+            {
+                $group: {
+                    _id: '$type',
+                    total: { $sum: '$total' },
+                },
+            },
+        ]);
+
+        return res.status(200).json(result);
+    } catch (error) {
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+
+export const searchHotelByType = async (req, res) => {
+    const { type } = req.query;
+
+    let typeValue = '';
+    switch (type) {
+        case '1':
+            typeValue = 'One Star';
+            break;
+        case '2':
+            typeValue = 'Two Star';
+            break;
+        case '3':
+            typeValue = 'Three Star';
+            break;
+        case '4':
+            typeValue = 'Four Star';
+            break;
+        case '5':
+            typeValue = 'Five Star';
+            break;
+        default:
+            return res.status(400).json({ message: 'Invalid type value.' });
+    }
+
+    try {
+        const hotels = await Hotel.find({ type: typeValue });
+
+        if (hotels.length === 0) {
+            return res.status(404).json({ message: 'Không tìm thấy khách sạn nào.' });
+        }
+
+        return res.status(200).json(hotels);
+    } catch (error) {
+        return res.status(500).json({ message: 'Có lỗi xảy ra khi tìm kiếm khách sạn.' });
+    }
+};
+
+
+
+
+
+
 
 
 

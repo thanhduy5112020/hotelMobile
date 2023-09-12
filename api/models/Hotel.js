@@ -27,7 +27,8 @@ const HotelSchema = new mongoose.Schema({
     },
     photos: {
         type: [String],
-    },
+        default: ["http://res.cloudinary.com/drsoiwmse/image/upload/v1679899575/upload/tahothoj3tdx5hguqvrn.jpg"]
+      },
     desc: {
         type: String,
         required: true
@@ -36,7 +37,7 @@ const HotelSchema = new mongoose.Schema({
         type: Number,
         min: 0,
         max: 10,
-        default: 8.0
+        default: 8.1
     },
     rooms: {
         type: [String],
@@ -58,5 +59,12 @@ const HotelSchema = new mongoose.Schema({
         default: 1,
     },
 })
+
+// HotelSchema.pre('save', function(next) {
+//     if (!this.photos || this.photos.length === 0) {
+//       this.photos = ['https://media.gettyimages.com/photos/luxurious-master-bedroom-interior-picture-id1266155645?k=20&m=1266155645&s=612x612&w=0&h=-F1NIvzuxtUPQRnrndhTM3X4EdM-Qt1GKDfN4coCqEs='];
+//     }
+//     next();
+//   });
 
 export default mongoose.model("Hotel", HotelSchema)

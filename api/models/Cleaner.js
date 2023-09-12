@@ -1,6 +1,4 @@
 import mongoose from 'mongoose';
-// const mongoose = require('mongoose');
-
 const { Schema } = mongoose;
 
 const CleanerSchema = new Schema({
@@ -12,6 +10,10 @@ const CleanerSchema = new Schema({
     type: Number,
     default: 0,
   },
+  workplace: {
+    type: String,
+    default: "Duy Hotel",
+  }
 });
 
 export default mongoose.model('Cleaner', CleanerSchema);

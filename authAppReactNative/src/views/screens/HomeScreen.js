@@ -16,6 +16,7 @@ import { Button, Overlay } from '@rneui/themed';
 import RoomAndGuestsPicker from './RoomAndGuestsPicker';
 import { AuthContext } from '../../context/AuthContext';
 import { SearchContext } from '../../context/SearchContext';
+import StarFilter from '../components/StarFilter';
 // import SearchItem from '../components/SearchItem';
 
 const { width } = Dimensions.get('screen');
@@ -147,7 +148,7 @@ const HomeScreen = ({ navigation }) => {
       </View>
     );
   };
-  const Card = ({ hotel, index, data }) => {
+  const Card = ({ hotel, index }) => {
     const inputRange = [
       (index - 1) * cardWidth,
       index * cardWidth,
@@ -258,6 +259,13 @@ const HomeScreen = ({ navigation }) => {
     );
   };
 
+  const [selectedStar, setSelectedStar] = React.useState(null);
+
+  const handleSelectedStar = (star) => {
+    setSelectedStar(star);
+  };
+  console.log("selectedStar ", selectedStar)
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
       <View style={style.header}>
@@ -307,7 +315,8 @@ const HomeScreen = ({ navigation }) => {
 
         {openDate && (
           <View style={{ flex: 1 }}>
-            <Calendar markingType={'period'} markedDates={markedDates} onDayPress={handleDayPress} minDate={new Date()} />
+            <Calendar markingType={'period'} markedDates={markedDates} onDayPress={handleDayPress} minDate={new Date().toISOString()} />
+
             {startDate && endDate && (
               <View style={{ alignItems: 'center' }}>
                 <Text style={{ marginTop: 20, fontSize: 18 }}>
@@ -333,6 +342,7 @@ const HomeScreen = ({ navigation }) => {
 
 
         <CategoryList />
+        {/* <StarFilter selectedStar={selectedStar} handleSelectedStar={handleSelectedStar}/> */}
         <View>
           <Animated.FlatList
             onMomentumScrollEnd={(e) => {
@@ -351,8 +361,9 @@ const HomeScreen = ({ navigation }) => {
               paddingLeft: 20,
               paddingRight: cardWidth / 2 - 40,
             }}
+            keyExtractor={(item, index) => index.toString()}
             showsHorizontalScrollIndicator={false}
-            renderItem={({ item, index }) => <Card hotel={item} index={index} key={index} />}
+            renderItem={({ item, index }) => <Card hotel={item} index={index} key={item._id} />}
             snapToInterval={cardWidth}
           />
         </View>
@@ -373,7 +384,8 @@ const HomeScreen = ({ navigation }) => {
             marginTop: 20,
             paddingBottom: 30,
           }}
-          renderItem={({ item, index }) => <TopHotelCard hotel={item} index={index} />}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item, index }) => <TopHotelCard hotel={item} index={index} key={item._id} />}
         />
       </ScrollView>
       {/* <SearchItem /> */}
